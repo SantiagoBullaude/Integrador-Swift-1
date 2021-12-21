@@ -4,6 +4,9 @@ import UIKit
 
 struct Parking{
     var vehicles: Set<Vehicle> = []
+    func checkInVehicle (:onFinish){
+        
+    }
 }
 
 protocol  Parkable{
@@ -78,5 +81,8 @@ alkeParkin.vehicles.insert(moto)
 alkeParkin.vehicles.insert(miniBus)
 
 alkeParkin.vehicles.insert(bus)
+
+alkeParkin.vehicles.insert(moto)
+
 
 
