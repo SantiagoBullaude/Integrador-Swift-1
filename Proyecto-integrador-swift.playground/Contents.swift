@@ -10,6 +10,20 @@ import UIKit
 
 struct Parking{
     var vehicles: Set<Vehicle> = []
+    let maxVehicles = 20
+    mutating func checkInVehicle(_ vehicle: Vehicle, onFinish:
+    (Bool) -> Void) {
+        guard maxVehicles < 20 else {
+            onFinish(false)
+            return //corta la ejecucuion si es mayor a 20
+        }
+//        func checkInVehicle(_ vehicle: Vehicle, onFinish:
+//        (Bool) -> Void) {
+//        guard let newPlate: String == plate else {
+//                onFinish(false)
+//        }
+    }
+    
 }
 
 protocol  Parkable{
@@ -39,6 +53,8 @@ struct Vehicle :Parkable, Hashable{
     static func ==(lhs:Vehicle,rhs:Vehicle)->Bool{
         return lhs.plate == rhs.plate
     }
+    
+    
 }
 
 enum VehicleType{
