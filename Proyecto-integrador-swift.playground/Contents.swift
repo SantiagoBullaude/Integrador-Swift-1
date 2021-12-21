@@ -1,4 +1,10 @@
-
+/*
+ Proyecto Integrador 1
+ Autores:
+    -Santiago Bullaude
+    -Valeria Malbran
+    -Dessiree Sanchez
+ */
 
 import UIKit
 
