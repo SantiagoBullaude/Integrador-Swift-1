@@ -14,12 +14,12 @@ struct Parking {
     
     mutating func checkInVehicle(_ vehicle: Vehicle, onFinish: (Bool) -> Void) {
         guard vehicles.count < maxVehicles else {
-            onFinish(false)
-            return //corta la ejecucuion si es mayor a 20
+            onFinish(false) // no hay puesto disponible
+            return //corta la ejecucion si es mayor a 20
         }
         
         guard vehicles.filter( { $0.plate == vehicle.plate}).isEmpty else {
-            onFinish(false)
+            onFinish(false) // no se puede ingresar vehiculo con la patente repetida
             return
         }
         
@@ -34,27 +34,28 @@ struct Parking {
         }
         
         vehicles.remove(vehicle)
-        onSuccess(5)
+        let totalToPay = calculateFee(type: vehicle.type, parkedTime: vehicle.parkedTime, hasDiscountCard: true)
+        onSuccess(totalToPay)
     }
 
-    mutating private func calculateFee(type: VehicleType, parkedTime: Int, totalToPay: Int){
+    mutating func calculateFee(type: VehicleType, parkedTime: Int, hasDiscountCard: Bool) -> Int {
+        var totalToPay = type.hourValue
         
+        if parkedTime > 120 { // mas de 2 horas (120 minutos)
+            let extra = (parkedTime - 120) / 15
+            totalToPay = totalToPay + Int(ceil(Double((extra * 5)) / 1.15))
+            
+            
+        }
+        
+        if hasDiscountCard {
+            
+        }
 
+        return totalToPay
     }
     
-    func calculateFee(type: VehicleType, parkedTime: Int, hasDiscountCard: Bool) -> Int {
-        
-        if parkedTime > 120 {
-            let reminderMins = parkedTime - 120
-            fee += Int(ceil(Double(reminderMins) / 15.0)) * 5
-        }
-        if hasDiscountCard {
-            fee = Int(Double(fee) * 0.85)
-        }
-        return fee
-    }
 }
-
 
 
 protocol Parkable {
@@ -247,6 +248,7 @@ print(alkeParkin.vehicles.count)
 //}
 
 
+print("El valor total a pagar es: \(alkeParkin.calculateFee(type: .moto, parkedTime: 30, hasDiscountCard: true))")
 
 
 
