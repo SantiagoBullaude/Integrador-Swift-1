@@ -42,16 +42,14 @@ struct Parking {
         var totalToPay = type.hourValue
         
         if parkedTime > 120 { // mas de 2 horas (120 minutos)
-            let extra = (parkedTime - 120) / 15
-            totalToPay = totalToPay + Int(ceil(Double((extra * 5)) / 1.15))
-            
-            
+            let extra = parkedTime - 120
+            totalToPay += Int(ceil(Double(extra) / 15.0)) * 5
         }
         
         if hasDiscountCard {
-            
+            totalToPay = Int(Double(totalToPay) * 0.85)
         }
-
+        
         return totalToPay
     }
     
@@ -86,8 +84,6 @@ struct Vehicle: Parkable, Hashable {
     static func == (lhs:Vehicle,rhs:Vehicle)->Bool{
         return lhs.plate == rhs.plate
     }
-    
-    
     
 }
 
@@ -146,7 +142,7 @@ alkeParkin.vehicles.insert(bus)
 
 
 // Instancia de vehiculos
-let vehicle1 = Vehicle(plate: "AA111AA", type: VehicleType.auto, checkInDate: Date(),                              discountCard:"DISCOUNT_CARD_001")
+let vehicle1 = Vehicle(plate: "AA111AA", type: VehicleType.auto, checkInDate: Date(), discountCard:"DISCOUNT_CARD_001")
 
 let vehicle2 = Vehicle(plate: "B222BBB", type:
                        VehicleType.moto, checkInDate: Date(), discountCard: nil)
@@ -247,8 +243,7 @@ print(alkeParkin.vehicles.count)
 //    }
 //}
 
-
-print("El valor total a pagar es: \(alkeParkin.calculateFee(type: .moto, parkedTime: 30, hasDiscountCard: true))")
+print("El valor total a pagar es: \(alkeParkin.calculateFee(type: .auto, parkedTime: 150, hasDiscountCard: true))")
 
 
 
