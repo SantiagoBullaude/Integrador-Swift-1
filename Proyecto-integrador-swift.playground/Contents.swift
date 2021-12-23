@@ -11,6 +11,7 @@ import UIKit
 struct Parking {
     var vehicles: Set<Vehicle> = []
     private let maxVehicles = 20
+    private var balance: (vehicles: Int, profits: Int) = (vehicles: 0, profits: 0)
     
     mutating func checkInVehicle(_ vehicle: Vehicle, onFinish: (Bool) -> Void) {
         guard vehicles.count < maxVehicles else {
@@ -33,8 +34,13 @@ struct Parking {
             return
         }
         
+        let hasDiscount = vehicle.discountCard != nil
+        
         vehicles.remove(vehicle)
-        let totalToPay = calculateFee(type: vehicle.type, parkedTime: vehicle.parkedTime, hasDiscountCard: true)
+        
+        let totalToPay = calculateFee(type: vehicle.type, parkedTime: vehicle.parkedTime, hasDiscountCard: hasDiscount)
+        
+        updateBalance(totalToPay: totalToPay)
         onSuccess(totalToPay)
     }
 
@@ -53,18 +59,29 @@ struct Parking {
         return totalToPay
     }
     
+    mutating private func updateBalance(totalToPay: Int) {
+        balance.vehicles += 1
+        balance.profits += totalToPay
+    }
+    
+    func showBalance() {
+        print("\(balance.vehicles) vehicles have checked out and have earnings of $\(balance.profits)")
+    }
+    
+    func listOfPlates() {
+        for vehicle in vehicles {
+            print(vehicle.plate)
+        }
+    }
 }
-
 
 protocol Parkable {
     var plate: String { get }
     var type: VehicleType { get }
-    var checkInDate: Date {get}
-    var discountCard : String? {get}
-    var parkedTime: Int {get}
+    var checkInDate: Date { get}
+    var discountCard : String? { get }
+    var parkedTime: Int { get }
 //    func checkOutVehicle(plate: String, onSuccess: (Int) -> Void, onError: () -> Void)
-
-    
 }
 
 struct Vehicle: Parkable, Hashable {
@@ -78,36 +95,34 @@ struct Vehicle: Parkable, Hashable {
     }
         
     func hash(into hasher: inout Hasher) {
-        hasher.combine(plate)
+        hasher.combine(plate) //indica en que parte del hasher guarda la patente
     }
     
-    static func == (lhs:Vehicle,rhs:Vehicle)->Bool{
+    static func == (lhs: Vehicle, rhs: Vehicle) -> Bool{ //define que los hará iguales
         return lhs.plate == rhs.plate
     }
-    
 }
-
 
 
 enum VehicleType {
     case auto, moto, miniBus, bus
     
-    var hourValue : Int{
+    var hourValue : Int {
         
         switch self {
-            
-            case .auto: return 20
-            
-            case .moto:return 15
-            
-            case .miniBus: return 25
+            case .auto:
+                return 20
     
-            case .bus: return 30
+            case .moto:
+                return 15
             
+            case .miniBus:
+                return 25
+    
+            case .bus:
+                return 30
         }
-      
     }
-    
 }
 
 var alkeParkin = Parking()
@@ -132,14 +147,6 @@ alkeParkin.vehicles.insert(moto)
 alkeParkin.vehicles.insert(miniBus)
 
 alkeParkin.vehicles.insert(bus)
-
-//var parking = Parking()
-//parking.checkInVehicle(bus) { finish in
-//    print(finish)
-//}
-//
-//print(parking.vehicles.count)
-
 
 // Instancia de vehiculos
 let vehicle1 = Vehicle(plate: "AA111AA", type: VehicleType.auto, checkInDate: Date(), discountCard:"DISCOUNT_CARD_001")
@@ -231,19 +238,41 @@ arrayOfVehicles.forEach { vehicle in
     }
 }
 
+//print("El valor total a pagar es: \(alkeParkin.calculateFee(type: .moto, parkedTime: 30, hasDiscountCard: true))")
+
+//Pruebas
+
+// FORMA 1 - Asignando a funcion
+func showResult(totalToPay: Int) {
+    print("Your fee is \(totalToPay). Come back soon")
+}
+
+func showError() {
+    print("Sorry the check-out failed")
+}
+
 print(alkeParkin.vehicles.count)
 
-//for vehicle in arrayOfVehicles {
-//    alkeParkin.checkInVehicle(vehicle) { registered in
-//        if registered {
-//            print("Welcome to AlkeParking!")
-//        } else {
-//            print("Sorry, the check-in failed")
-//        }
-//    }
-//}
-
-print("El valor total a pagar es: \(alkeParkin.calculateFee(type: .auto, parkedTime: 150, hasDiscountCard: true))")
+// FORMA 2 - anónima
+alkeParkin.checkOutVehicle(plate: "DD444GG") { totalToPay in
+    print("Your fee is \(totalToPay). Come back soon")
+} onError: {
+    print("Sorry the check-out failed")
+}
 
 
 
+print(alkeParkin.checkOutVehicle(plate: "B222EEE", onSuccess: showResult, onError: showError))
+print(alkeParkin.checkOutVehicle(plate: "CC555FF", onSuccess: showResult, onError: showError))
+print(alkeParkin.checkOutVehicle(plate: "B222EEF", onSuccess: showResult, onError: showError))
+print(alkeParkin.checkOutVehicle(plate: "B222EEG", onSuccess: showResult, onError: showError))
+print(alkeParkin.showBalance())
+
+
+
+alkeParkin.listOfPlates()
+
+
+print(alkeParkin.vehicles.count)
+
+print(alkeParkin.showBalance())
